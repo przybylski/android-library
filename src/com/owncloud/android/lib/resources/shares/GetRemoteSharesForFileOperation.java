@@ -1,4 +1,6 @@
 /* ownCloud Android Library is available under MIT license
+ *   @author masensio
+ *   @author David A. Velasco
  *   Copyright (C) 2015 ownCloud Inc.
  *   
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,10 +26,6 @@
 
 package com.owncloud.android.lib.resources.shares;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.http.HttpStatus;
@@ -35,19 +33,14 @@ import org.apache.http.HttpStatus;
 import com.owncloud.android.lib.common.OwnCloudClient;
 import com.owncloud.android.lib.common.operations.RemoteOperation;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
-import com.owncloud.android.lib.common.operations.RemoteOperationResult.ResultCode;
 import com.owncloud.android.lib.common.utils.Log_OC;
-import com.owncloud.android.lib.resources.status.OwnCloudVersion;
+
 
 /**
  * Provide a list shares for a specific file.  
  * The input is the full path of the desired file.  
  * The output is a list of everyone who has the file shared with them.
- * 
- * @author masensio
- *
  */
-
 public class GetRemoteSharesForFileOperation extends RemoteOperation {
 
 	private static final String TAG = GetRemoteSharesForFileOperation.class.getSimpleName();
@@ -56,8 +49,6 @@ public class GetRemoteSharesForFileOperation extends RemoteOperation {
 	private static final String PARAM_RESHARES = "reshares";
 	private static final String PARAM_SUBFILES = "subfiles";
 
-	private ArrayList<OCShare> mShares;  // List of shares for result, one share in this case
-	
 	private String mRemoteFilePath;
 	private boolean mReshares;
 	private boolean mSubfiles;
@@ -104,31 +95,16 @@ public class GetRemoteSharesForFileOperation extends RemoteOperation {
 			if(isSuccess(status)) {
 				String response = get.getResponseBodyAsString();
 
-				result = new RemoteOperationResult(ResultCode.OK);
-				
-				// Parse xml response --> obtain the response in ShareFiles ArrayList
-				// convert String into InputStream
-				InputStream is = new ByteArrayInputStream(response.getBytes());
-				ShareXMLParser xmlParser = new ShareXMLParser();
-				mShares = xmlParser.parseXMLResponse(is);
-				if (mShares != null) {
-					Log_OC.d(TAG, "Got " + mShares.size() + " shares");
-					result = new RemoteOperationResult(ResultCode.OK);
-					ArrayList<Object> sharesObjects = new ArrayList<Object>();
-					for (OCShare share: mShares) {
-						// Build the link
-						if (	share.getShareType() == ShareType.PUBLIC_LINK &&
-								share.getShareLink() == null &&
-								share.getToken().length() > 0
-								) {
-							String linkToken = ShareUtils.getSharingToken(
-									client.getOwnCloudVersion());
-							share.setShareLink(client.getBaseUri() + linkToken +
-									share.getToken());
-						}
-						sharesObjects.add(share);
-					}
-					result.setData(sharesObjects);
+				// Parse xml response and obtain the list of shares
+				ShareToRemoteOperationResultParser parser = new ShareToRemoteOperationResultParser(
+						new ShareXMLParser()
+				);
+				parser.setOwnCloudVersion(client.getOwnCloudVersion());
+				parser.setServerBaseUri(client.getBaseUri());
+				result = parser.parse(response);
+
+				if (result.isSuccess()) {
+					Log_OC.d(TAG, "Got " + result.getData().size() + " shares");
 				}
 
 			} else {

@@ -1,4 +1,6 @@
 /* ownCloud Android Library is available under MIT license
+ *   @author masensio
+ *   @author David A. Velasco
  *   Copyright (C) 2015 ownCloud Inc.
  *   
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,24 +26,16 @@
 
 package com.owncloud.android.lib.resources.shares;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.http.HttpStatus;
 
 import com.owncloud.android.lib.common.OwnCloudClient;
 import com.owncloud.android.lib.common.operations.RemoteOperation;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
-import com.owncloud.android.lib.common.operations.RemoteOperationResult.ResultCode;
 import com.owncloud.android.lib.common.utils.Log_OC;
 
 /**
  * Creates a new share.  This allows sharing with a user or group or as a link.
- * 
- * @author masensio
- *
  */
 public class CreateRemoteShareOperation extends RemoteOperation {
 
@@ -54,8 +48,6 @@ public class CreateRemoteShareOperation extends RemoteOperation {
 	private static final String PARAM_PASSWORD = "password";
 	private static final String PARAM_PERMISSIONS = "permissions";
 
-	private ArrayList<OCShare> mShares;  // List of shares for result, one share in this case
-	
 	private String mRemoteFilePath;
 	private ShareType mShareType;
 	private String mShareWith;
@@ -68,7 +60,8 @@ public class CreateRemoteShareOperation extends RemoteOperation {
 	 * Constructor
 	 * @param remoteFilePath	Full path of the file/folder being shared. Mandatory argument
 	 * @param shareType			0 = user, 1 = group, 3 = Public link. Mandatory argument
-	 * @param shareWith			User/group ID with who the file should be shared.  This is mandatory for shareType of 0 or 1
+	 * @param shareWith			User/group ID with who the file should be shared.  This is mandatory for shareType
+	 *                          of 0 or 1
 	 * @param publicUpload		If false (default) public cannot upload to a public shared folder.
 	 * 							If true public can upload to a shared folder. Only available for public link shares
 	 * @param password			Password to protect a public link share. Only available for public link shares
@@ -118,7 +111,6 @@ public class CreateRemoteShareOperation extends RemoteOperation {
 		try {
 			// Post Method
 			post = new PostMethod(client.getBaseUri() + ShareUtils.SHARING_API_PATH);
-			//Log_OC.d(TAG, "URL ------> " + client.getBaseUri() + ShareUtils.SHARING_API_PATH);
 
 			post.setRequestHeader( "Content-Type",
                     "application/x-www-form-urlencoded; charset=utf-8"); // necessary for special characters
@@ -127,7 +119,7 @@ public class CreateRemoteShareOperation extends RemoteOperation {
 			post.addParameter(PARAM_SHARE_TYPE, Integer.toString(mShareType.getValue()));
 			post.addParameter(PARAM_SHARE_WITH, mShareWith);
 			if (mPublicUpload) {
-				post.addParameter(PARAM_PUBLIC_UPLOAD, Boolean.toString(mPublicUpload));
+				post.addParameter(PARAM_PUBLIC_UPLOAD, Boolean.toString(true));
 			}
 			if (mPassword != null && mPassword.length() > 0) {
 				post.addParameter(PARAM_PASSWORD, mPassword);
@@ -141,45 +133,21 @@ public class CreateRemoteShareOperation extends RemoteOperation {
 			if(isSuccess(status)) {
 				String response = post.getResponseBodyAsString();
 
-				result = new RemoteOperationResult(ResultCode.OK);
-				
-				// Parse xml response --> obtain the response in ShareFiles ArrayList
-				// convert String into InputStream
-				InputStream is = new ByteArrayInputStream(response.getBytes());
-				ShareXMLParser xmlParser = new ShareXMLParser();
-				mShares = xmlParser.parseXMLResponse(is);
-				if (xmlParser.isSuccess()) {
-					if (mShares != null) {
-						Log_OC.d(TAG, "Created " + mShares.size() + " share(s)");
-						result = new RemoteOperationResult(ResultCode.OK);
-						ArrayList<Object> sharesObjects = new ArrayList<Object>();
-						for (OCShare share: mShares) {
-							sharesObjects.add(share);
-						}
-						result.setData(sharesObjects);
+				ShareToRemoteOperationResultParser parser = new ShareToRemoteOperationResultParser(
+						new ShareXMLParser()
+				);
+				parser.setOneOrMoreSharesRequired(true);
+				parser.setOwnCloudVersion(client.getOwnCloudVersion());
+				parser.setServerBaseUri(client.getBaseUri());
+				result = parser.parse(response);
 
-						if (mGetShareDetails) {
-							// retrieve more info
-							OCShare emptyShare = (OCShare) sharesObjects.get(0);
-
-							GetRemoteShareOperation getInfo = new GetRemoteShareOperation(emptyShare.getIdRemoteShared());
-							result = getInfo.execute(client);
-						}
-
-					} else {
-						result = new RemoteOperationResult(ResultCode.UNKNOWN_ERROR);
-						Log_OC.e(TAG, "Successful response with no share in it");
-					}
-
-				} else if (xmlParser.isFileNotFound()){
-					result = new RemoteOperationResult(ResultCode.SHARE_NOT_FOUND);
-					
-				} else if (xmlParser.isFailure()) {
-					// TODO need deeper processing
-					result = new RemoteOperationResult(ResultCode.SHARE_FORBIDDEN);
-
-				} else {
-					result = new RemoteOperationResult(false, status, post.getResponseHeaders());	
+				if (result.isSuccess() && mGetShareDetails) {
+					// retrieve more info - POST only returns the index of the new share
+					OCShare emptyShare = (OCShare) result.getData().get(0);
+					GetRemoteShareOperation getInfo = new GetRemoteShareOperation(
+							emptyShare.getIdRemoteShared()
+					);
+					result = getInfo.execute(client);
 				}
 
 			} else {
