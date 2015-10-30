@@ -25,7 +25,6 @@
 
 package com.owncloud.android.lib.resources.status;
 
-import android.content.Context;
 import android.net.Uri;
 
 import com.owncloud.android.lib.common.OwnCloudClient;
@@ -35,7 +34,6 @@ import com.owncloud.android.lib.common.utils.Log_OC;
 
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.http.HttpStatus;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -46,7 +44,24 @@ import java.util.Hashtable;
  *
  * Save in Result.getData:
  * - data[0]: Version node in a HashTable<String,String> with the keys:
- *      -
+ *      - major
+ *      - minor
+ *      - micro
+ *      - string
+ *      - edition
+ * - data[1]: int with core-pollinterval
+ * - data[2]: Files Sharing node in a HashTable<Boolean, String> with the keys:
+ *      - public:enabled
+ *      - public-password:enforced
+ *      - public-expire_date:enabled
+ *      - public:send_mail
+ *      - public:upload
+ *      - user:send_mail
+ *      - resharing
+ * - data[3]: Files node in a HashTable<Boolean, String> with the keys:
+ *      - files:bigfilechunking
+ *      - files:undelete
+ *      - files:versioning
  */
 public class GetRemoteCapabilitiesOperation extends RemoteOperation {
 
@@ -177,7 +192,7 @@ public class GetRemoteCapabilitiesOperation extends RemoteOperation {
                     fileSharing.put(respPublic.getBoolean(PROPERTY_UPLOAD),
                             NODE_PUBLIC + ":" + PROPERTY_UPLOAD);
                     fileSharing.put(respUser.getBoolean(PROPERTY_SEND_MAIL),
-                            NODE_USER + "-" + NODE_USER + ":" + PROPERTY_SEND_MAIL);
+                            NODE_USER + ":" + PROPERTY_SEND_MAIL);
                     fileSharing.put(respFilesSharing.getBoolean(PROPERTY_RESHARING), PROPERTY_RESHARING);
                     data.add(fileSharing);
                     Log_OC.d(TAG, "*** Added " + NODE_FILE_SHARING);
