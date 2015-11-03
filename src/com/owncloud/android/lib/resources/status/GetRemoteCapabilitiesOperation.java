@@ -70,11 +70,11 @@ public class GetRemoteCapabilitiesOperation extends RemoteOperation {
     private static final String NODE_CORE = "core";
 
     private static final String NODE_FILES_SHARING = "files_sharing";
-    public static final String NODE_PUBLIC = "public";
-    public static final String NODE_PASSWORD = "password";
-    public static final String NODE_EXPIRE_DATE = "expire_date";
-    public static final String NODE_USER = "user";
-    public static final String NODE_FILES = "files";
+    private static final String NODE_PUBLIC = "public";
+    private static final String NODE_PASSWORD = "password";
+    private static final String NODE_EXPIRE_DATE = "expire_date";
+    private static final String NODE_USER = "user";
+    private static final String NODE_FILES = "files";
 
     private static final String PROPERTY_STATUS = "status";
     private static final String PROPERTY_STATUSCODE = "statuscode";
@@ -82,21 +82,21 @@ public class GetRemoteCapabilitiesOperation extends RemoteOperation {
 
     private static final String PROPERTY_POLLINTERVAL = "pollinterval";
 
-    public static final String PROPERTY_MAJOR = "major";
-    public static final String PROPERTY_MINOR = "minor";
-    public static final String PROPERTY_MICRO = "micro";
-    public static final String PROPERTY_STRING = "string";
-    public static final String PROPERTY_EDITION = "edition";
+    private static final String PROPERTY_MAJOR = "major";
+    private static final String PROPERTY_MINOR = "minor";
+    private static final String PROPERTY_MICRO = "micro";
+    private static final String PROPERTY_STRING = "string";
+    private static final String PROPERTY_EDITION = "edition";
 
-    public static final String PROPERTY_ENABLED = "enabled";
-    public static final String PROPERTY_ENFORCED = "enforced";
-    public static final String PROPERTY_SEND_MAIL = "send_mail";
-    public static final String PROPERTY_UPLOAD = "upload";
-    public static final String PROPERTY_RESHARING = "resharing";
+    private static final String PROPERTY_ENABLED = "enabled";
+    private static final String PROPERTY_ENFORCED = "enforced";
+    private static final String PROPERTY_SEND_MAIL = "send_mail";
+    private static final String PROPERTY_UPLOAD = "upload";
+    private static final String PROPERTY_RESHARING = "resharing";
 
-    public static final String PROPERTY_BIGFILECHUNKING = "bigfilechunking";
-    public static final String PROPERTY_UNDELETE = "undelete";
-    public static final String PROPERTY_VERSIONING = "versioning";
+    private static final String PROPERTY_BIGFILECHUNKING = "bigfilechunking";
+    private static final String PROPERTY_UNDELETE = "undelete";
+    private static final String PROPERTY_VERSIONING = "versioning";
 
 
     /**
@@ -143,7 +143,7 @@ public class GetRemoteCapabilitiesOperation extends RemoteOperation {
                 JSONObject respFiles = respCapabilities.getJSONObject(NODE_FILES);
 
                 // Read meta
-                boolean statusProp = respMeta.getBoolean(PROPERTY_STATUS);
+                boolean statusProp = respMeta.getString(PROPERTY_STATUS).equalsIgnoreCase("ok");
                 int statuscode = respMeta.getInt(PROPERTY_STATUSCODE);
                 String message = respMeta.getString(PROPERTY_MESSAGE);
 
@@ -181,6 +181,7 @@ public class GetRemoteCapabilitiesOperation extends RemoteOperation {
                     Log_OC.d(TAG, "*** Added " + NODE_FILES);
 
                     // Result
+                    data.add(capability);
                     result = new RemoteOperationResult(true, status, get.getResponseHeaders());
                     result.setData(data);
 
