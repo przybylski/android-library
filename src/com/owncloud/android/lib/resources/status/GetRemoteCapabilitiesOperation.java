@@ -87,6 +87,7 @@ public class GetRemoteCapabilitiesOperation extends RemoteOperation {
 
     private static final String NODE_CAPABILITIES = "capabilities";
     private static final String NODE_CORE = "core";
+
     private static final String NODE_FILES_SHARING = "files_sharing";
     public static final String NODE_PUBLIC = "public";
     public static final String NODE_PASSWORD = "password";
@@ -195,6 +196,7 @@ public class GetRemoteCapabilitiesOperation extends RemoteOperation {
                             NODE_USER + ":" + PROPERTY_SEND_MAIL);
                     fileSharing.put(respFilesSharing.getBoolean(PROPERTY_RESHARING), PROPERTY_RESHARING);
                     data.add(fileSharing);
+
                     Log_OC.d(TAG, "*** Added " + NODE_FILES_SHARING);
 
                     // Add files
