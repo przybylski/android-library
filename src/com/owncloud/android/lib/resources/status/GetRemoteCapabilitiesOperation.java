@@ -42,26 +42,7 @@ import java.util.Hashtable;
 /**
  * Get the Capabilities from the server
  *
- * Save in Result.getData:
- * - data[0]: Version node in a HashTable<String,String> with the keys:
- *      - major
- *      - minor
- *      - micro
- *      - string
- *      - edition
- * - data[1]: int with core-pollinterval
- * - data[2]: Files Sharing node in a HashTable<Boolean, String> with the keys:
- *      - public:enabled
- *      - public-password:enforced
- *      - public-expire_date:enabled
- *      - public:send_mail
- *      - public:upload
- *      - user:send_mail
- *      - resharing
- * - data[3]: Files node in a HashTable<Boolean, String> with the keys:
- *      - files:bigfilechunking
- *      - files:undelete
- *      - files:versioning
+ * Save in Result.getData in a OCCapability object
  */
 public class GetRemoteCapabilitiesOperation extends RemoteOperation {
 
@@ -168,46 +149,35 @@ public class GetRemoteCapabilitiesOperation extends RemoteOperation {
 
                 if (statusProp) {
                     ArrayList<Object> data = new ArrayList<Object>(); // For result data
+                    OCCapability capability = new OCCapability();
                     // Add Version
-                    Hashtable<String, String> versionTable = new Hashtable<String, String>(5);
-                    versionTable.put(String.valueOf(respVersion.getInt(PROPERTY_MAJOR)), PROPERTY_MAJOR);
-                    versionTable.put(String.valueOf(respVersion.getInt(PROPERTY_MINOR)), PROPERTY_MINOR);
-                    versionTable.put(String.valueOf(respVersion.getInt(PROPERTY_MICRO)), PROPERTY_MICRO);
-                    versionTable.put(respVersion.getString(PROPERTY_STRING), PROPERTY_STRING);
-                    versionTable.put(respVersion.getString(PROPERTY_EDITION), PROPERTY_EDITION);
-                    data.add(versionTable);
+                    capability.setVersionMayor(respVersion.getInt(PROPERTY_MAJOR));
+                    capability.setVersionMinor(respVersion.getInt(PROPERTY_MINOR));
+                    capability.setVersionMicro(respVersion.getInt(PROPERTY_MICRO));
+                    capability.setVersionString(respVersion.getString(PROPERTY_STRING));
+                    capability.setVersionEdition(respVersion.getString(PROPERTY_EDITION));
                     Log_OC.d(TAG, "*** Added " + NODE_VERSION);
 
                     // Add Core: pollinterval
-                    data.add(respCore.getInt(PROPERTY_POLLINTERVAL));
+                    capability.setCorePollinterval(respCore.getInt(PROPERTY_POLLINTERVAL));
                     Log_OC.d(TAG, "*** Added " + NODE_CORE);
 
                     // Add files_sharing: public, user, resharing
-                    Hashtable<Boolean, String> fileSharing = new Hashtable<Boolean, String>(6);
-                    fileSharing.put(respPublic.getBoolean(PROPERTY_ENABLED),
-                            NODE_PUBLIC + ":" + PROPERTY_ENABLED);
-                    fileSharing.put(respPublic.getJSONObject(NODE_PASSWORD).getBoolean(PROPERTY_ENFORCED),
-                            NODE_PUBLIC + "-" + NODE_PASSWORD + ":" + PROPERTY_ENFORCED);
-                    fileSharing.put(respPublic.getJSONObject(NODE_EXPIRE_DATE).getBoolean(PROPERTY_ENABLED),
-                            NODE_PUBLIC + "-" + NODE_EXPIRE_DATE + ":" + PROPERTY_ENABLED);
-                    fileSharing.put(respPublic.getBoolean(PROPERTY_UPLOAD),
-                            NODE_PUBLIC + ":" + PROPERTY_UPLOAD);
-                    fileSharing.put(respUser.getBoolean(PROPERTY_SEND_MAIL),
-                            NODE_USER + ":" + PROPERTY_SEND_MAIL);
-                    fileSharing.put(respFilesSharing.getBoolean(PROPERTY_RESHARING), PROPERTY_RESHARING);
-                    data.add(fileSharing);
-
+                    capability.setFilesSharingPublicEnabled(respPublic.getBoolean(PROPERTY_ENABLED));
+                    capability.setFilesPublicPasswordEnforced(
+                            respPublic.getJSONObject(NODE_PASSWORD).getBoolean(PROPERTY_ENFORCED));
+                    capability.setFilesSharingPublicExpireDateEnabled(
+                            respPublic.getJSONObject(NODE_EXPIRE_DATE).getBoolean(PROPERTY_ENABLED));
+                    capability.setFilesSharingPublicSendMail(respPublic.getBoolean(PROPERTY_SEND_MAIL));
+                    capability.setFilesSharingPublicUpload(respPublic.getBoolean(PROPERTY_UPLOAD));
+                    capability.setFilesSharingUserSendMail(respUser.getBoolean(PROPERTY_SEND_MAIL));
+                    capability.setFilesSharingResharing(respFilesSharing.getBoolean(PROPERTY_RESHARING));
                     Log_OC.d(TAG, "*** Added " + NODE_FILES_SHARING);
 
                     // Add files
-                    Hashtable<Boolean, String> files = new Hashtable<Boolean, String>(3);
-                    files.put(respFiles.getBoolean(PROPERTY_BIGFILECHUNKING),
-                            NODE_FILES + ":" + PROPERTY_BIGFILECHUNKING);
-                    files.put(respFiles.getBoolean(PROPERTY_UNDELETE),
-                            NODE_FILES + ":" + PROPERTY_UNDELETE);
-                    files.put(respFiles.getBoolean(PROPERTY_VERSIONING),
-                            NODE_FILES + ":" + PROPERTY_VERSIONING);
-                    data.add(files);
+                    capability.setFilesBigFileChuncking(respFiles.getBoolean(PROPERTY_BIGFILECHUNKING));
+                    capability.setFilesUndelete(respFiles.getBoolean(PROPERTY_UNDELETE));
+                    capability.setFilesVersioning(respFiles.getBoolean(PROPERTY_VERSIONING));
                     Log_OC.d(TAG, "*** Added " + NODE_FILES);
 
                     // Result
