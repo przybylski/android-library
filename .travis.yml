@@ -23,5 +23,18 @@ env:
   - secure: HxHoqnC8mauCKi87zlo7pQcSsSw0W5MtW+iUcB8T11quwTBgUPWIOmycXv2FcmwpST0E43Ct+dhE+mttm+6P+5PSB33HQNLq00hfTVIJ4ttcb/5eWW8MnP7L+kPK8d0EtfDG6GQto7QktaybeG4+sNKKD336ZlFfM7xgPtPv+tg=
   - secure: WQMw0ciloe8i2ApGhePhuTmmH8UgAV1Ri10C1qhUH9hVOJAr+/1X5A93VPYGrgJ2EH5MdiL6f2XMDCYAgb9efuvZIUKNE0J92xh8m/yRa8nAVWNBE0PBdS4+OycoHpIQfMcUghooERXjP4GUYd/ZwICvWA+sXdOYWDdKjODUgl4=
   - secure: QPxKT8vC7sm1b/hYJcfkQkLgpwNRBvVKk8S8S0t43mmqPJfs94FJTQHH4kZaGSwOeuDkRQbGuKzYtXOnGOKX2hhUBqKJd1idpJnUID8id8Kqo6VutjG017+XxZQp0hPHmfmDxYkDvlaLeoZpP2NkpwZ1p4TL2MSCr2Ibl6uTWvc=
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+  - secure: "epTZ0zZGDbHL3o6vSC9uNkZsi5j5SA6O/tvQBH7QW/dluuzIJxIjfhNbZHDyBReYDleirLzUFQpdWAUdvulCMLs/qZdIzFGlYXZSpxEnvPYMGQcilwADdJcxLw8L+3+ET5hSexxhjrTGw427IljkqGUpqQTxaLwFdFu98lDWSbc="
   matrix:
   - ANDROID_TARGET=android-19 ANDROID_ABI=armeabi-v7a
+
+addons:
+  coverity_scan:
+    project:
+      name: "owncloud/android-library"
+      description: "Build submitted via Travis CI"
+    notification_email: lukas@owncloud.com
+    build_command_prepend: "gradle clean"
+    build_command:   "gradle build"
+    branch_pattern: "*"
