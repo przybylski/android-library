@@ -164,7 +164,7 @@ public class OCCapability {
         this.mCorePollinterval = corePollinterval;
     }
 
-    public CapabilityBooleanType isFilesSharingApiEnabled() {
+    public CapabilityBooleanType getFilesSharingApiEnabled() {
         return mFilesSharingApiEnabled;
     }
 
@@ -172,7 +172,7 @@ public class OCCapability {
         this.mFilesSharingApiEnabled = filesSharingApiEnabled;
     }
 
-    public CapabilityBooleanType isFilesSharingPublicEnabled() {
+    public CapabilityBooleanType getFilesSharingPublicEnabled() {
         return mFilesSharingPublicEnabled;
     }
 
@@ -180,7 +180,7 @@ public class OCCapability {
         this.mFilesSharingPublicEnabled = filesSharingPublicEnabled;
     }
 
-    public CapabilityBooleanType isFilesPublicPasswordEnforced() {
+    public CapabilityBooleanType getFilesPublicPasswordEnforced() {
         return mFilesPublicPasswordEnforced;
     }
 
@@ -188,7 +188,7 @@ public class OCCapability {
         this.mFilesPublicPasswordEnforced = filesPublicPasswordEnforced;
     }
 
-    public CapabilityBooleanType isFilesSharingPublicExpireDateEnabled() {
+    public CapabilityBooleanType getFilesSharingPublicExpireDateEnabled() {
         return mFilesSharingPublicExpireDateEnabled;
     }
 
@@ -204,7 +204,7 @@ public class OCCapability {
         this.mFilesSharingPublicExpireDateDays = filesSharingPublicExpireDateDays;
     }
 
-    public CapabilityBooleanType isFilesSharingPublicExpireDateEnforced() {
+    public CapabilityBooleanType getFilesSharingPublicExpireDateEnforced() {
         return mFilesSharingPublicExpireDateEnforced;
     }
 
@@ -213,7 +213,7 @@ public class OCCapability {
     }
 
 
-    public CapabilityBooleanType isFilesSharingPublicSendMail() {
+    public CapabilityBooleanType getFilesSharingPublicSendMail() {
         return mFilesSharingPublicSendMail;
     }
 
@@ -221,7 +221,7 @@ public class OCCapability {
         this.mFilesSharingPublicSendMail = filesSharingPublicSendMail;
     }
 
-    public CapabilityBooleanType isFilesSharingPublicUpload() {
+    public CapabilityBooleanType getFilesSharingPublicUpload() {
         return mFilesSharingPublicUpload;
     }
 
@@ -229,7 +229,7 @@ public class OCCapability {
         this.mFilesSharingPublicUpload = filesSharingPublicUpload;
     }
 
-    public CapabilityBooleanType isFilesSharingUserSendMail() {
+    public CapabilityBooleanType getFilesSharingUserSendMail() {
         return mFilesSharingUserSendMail;
     }
 
@@ -237,16 +237,15 @@ public class OCCapability {
         this.mFilesSharingUserSendMail = filesSharingUserSendMail;
     }
 
-    public CapabilityBooleanType isFilesSharingResharing() {
+    public CapabilityBooleanType getFilesSharingResharing() {
         return mFilesSharingResharing;
     }
 
     public void setFilesSharingResharing(CapabilityBooleanType filesSharingResharing) {
         this.mFilesSharingResharing = filesSharingResharing;
     }
-
-
-    public CapabilityBooleanType isFilesSharingFederationOutgoing() {
+    
+    public CapabilityBooleanType getFilesSharingFederationOutgoing() {
         return mFilesSharingFederationOutgoing;
     }
 
@@ -254,7 +253,7 @@ public class OCCapability {
         this.mFilesSharingFederationOutgoing = filesSharingFederationOutgoing;
     }
 
-    public CapabilityBooleanType isFilesSharingFederationIncoming() {
+    public CapabilityBooleanType getFilesSharingFederationIncoming() {
         return mFilesSharingFederationIncoming;
     }
 
@@ -262,7 +261,7 @@ public class OCCapability {
         this.mFilesSharingFederationIncoming = filesSharingFederationIncoming;
     }
 
-    public CapabilityBooleanType isFilesBigFileChuncking() {
+    public CapabilityBooleanType getFilesBigFileChuncking() {
         return mFilesBigFileChuncking;
     }
 
@@ -270,7 +269,7 @@ public class OCCapability {
         this.mFilesBigFileChuncking = filesBigFileChuncking;
     }
 
-    public CapabilityBooleanType isFilesUndelete() {
+    public CapabilityBooleanType getFilesUndelete() {
         return mFilesUndelete;
     }
 
@@ -278,7 +277,7 @@ public class OCCapability {
         this.mFilesUndelete = filesUndelete;
     }
 
-    public CapabilityBooleanType isFilesVersioning() {
+    public CapabilityBooleanType getFilesVersioning() {
         return mFilesVersioning;
     }
 

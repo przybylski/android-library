@@ -140,14 +140,6 @@ public class GetRemoteCapabilitiesOperation extends RemoteOperation {
                 JSONObject respOCS = respJSON.getJSONObject(NODE_OCS);
                 JSONObject respMeta = respOCS.getJSONObject(NODE_META);
                 JSONObject respData = respOCS.getJSONObject(NODE_DATA);
-                JSONObject respVersion = respData.getJSONObject(NODE_VERSION);
-                JSONObject respCapabilities = respData.getJSONObject(NODE_CAPABILITIES);
-                JSONObject respCore = respCapabilities.getJSONObject(NODE_CORE);
-                JSONObject respFilesSharing = respCapabilities.getJSONObject(NODE_FILES_SHARING);
-                JSONObject respPublic = respFilesSharing.getJSONObject(NODE_PUBLIC);
-                JSONObject respUser = respFilesSharing.getJSONObject(NODE_USER);
-                JSONObject respFederation = respFilesSharing.getJSONObject(NODE_FEDERATION);
-                JSONObject respFiles = respCapabilities.getJSONObject(NODE_FILES);
 
                 // Read meta
                 boolean statusProp = respMeta.getString(PROPERTY_STATUS).equalsIgnoreCase("ok");
@@ -158,54 +150,93 @@ public class GetRemoteCapabilitiesOperation extends RemoteOperation {
                     ArrayList<Object> data = new ArrayList<Object>(); // For result data
                     OCCapability capability = new OCCapability();
                     // Add Version
-                    capability.setVersionMayor(respVersion.getInt(PROPERTY_MAJOR));
-                    capability.setVersionMinor(respVersion.getInt(PROPERTY_MINOR));
-                    capability.setVersionMicro(respVersion.getInt(PROPERTY_MICRO));
-                    capability.setVersionString(respVersion.getString(PROPERTY_STRING));
-                    capability.setVersionEdition(respVersion.getString(PROPERTY_EDITION));
-                    Log_OC.d(TAG, "*** Added " + NODE_VERSION);
+                    if (respData.has(NODE_VERSION)) {
+                        JSONObject respVersion = respData.getJSONObject(NODE_VERSION);
+                        capability.setVersionMayor(respVersion.getInt(PROPERTY_MAJOR));
+                        capability.setVersionMinor(respVersion.getInt(PROPERTY_MINOR));
+                        capability.setVersionMicro(respVersion.getInt(PROPERTY_MICRO));
+                        capability.setVersionString(respVersion.getString(PROPERTY_STRING));
+                        capability.setVersionEdition(respVersion.getString(PROPERTY_EDITION));
+                        Log_OC.d(TAG, "*** Added " + NODE_VERSION);
+                    }
 
-                    // Add Core: pollinterval
-                    capability.setCorePollinterval(respCore.getInt(PROPERTY_POLLINTERVAL));
-                    Log_OC.d(TAG, "*** Added " + NODE_CORE);
+                    // Capabilities Object
+                    if (respData.has(NODE_CAPABILITIES)) {
+                        JSONObject respCapabilities = respData.getJSONObject(NODE_CAPABILITIES);
 
-                    // Add files_sharing: public, user, resharing
-                    capability.setFilesSharingApiEnabled(
-                            CapabilityBooleanType.fromBooleanValue(respPublic.getBoolean(PROPERTY_API_ENABLED)));
-                    capability.setFilesSharingPublicEnabled(
-                            CapabilityBooleanType.fromBooleanValue(respPublic.getBoolean(PROPERTY_ENABLED)));
-                    capability.setFilesPublicPasswordEnforced(
-                            CapabilityBooleanType.fromBooleanValue(
-                                    respPublic.getJSONObject(NODE_PASSWORD).getBoolean(PROPERTY_ENFORCED)));
-                    capability.setFilesSharingPublicExpireDateEnabled(
-                            CapabilityBooleanType.fromBooleanValue(
-                                    respPublic.getJSONObject(NODE_EXPIRE_DATE).getBoolean(PROPERTY_ENABLED)));
-                    capability.setFilesSharingPublicExpireDateDays(
-                            respPublic.getJSONObject(NODE_EXPIRE_DATE).getInt(PROPERTY_DAYS));
-                    capability.setFilesSharingPublicExpireDateEnforced(
-                            CapabilityBooleanType.fromBooleanValue(
-                                    respPublic.getJSONObject(NODE_EXPIRE_DATE).getBoolean(PROPERTY_ENFORCED)));
-                    capability.setFilesSharingPublicUpload(
-                            CapabilityBooleanType.fromBooleanValue(respPublic.getBoolean(PROPERTY_UPLOAD)));
-                    capability.setFilesSharingUserSendMail(
-                            CapabilityBooleanType.fromBooleanValue(respUser.getBoolean(PROPERTY_SEND_MAIL)));
-                    capability.setFilesSharingResharing(
-                            CapabilityBooleanType.fromBooleanValue(respFilesSharing.getBoolean(PROPERTY_RESHARING)));
-                    capability.setFilesSharingFederationOutgoing(
-                            CapabilityBooleanType.fromBooleanValue(respFederation.getBoolean(PROPERTY_OUTGOING)));
-                    capability.setFilesSharingFederationOutgoing(
-                            CapabilityBooleanType.fromBooleanValue(respFederation.getBoolean(PROPERTY_INCOMING)));
-                    Log_OC.d(TAG, "*** Added " + NODE_FILES_SHARING);
+                        // Add Core: pollinterval
+                        if (respCapabilities.has(NODE_CORE)) {
+                            JSONObject respCore = respCapabilities.getJSONObject(NODE_CORE);
+                            capability.setCorePollinterval(respCore.getInt(PROPERTY_POLLINTERVAL));
+                            Log_OC.d(TAG, "*** Added " + NODE_CORE);
+                        }
 
-                    // Add files
-                    capability.setFilesBigFileChuncking(
-                            CapabilityBooleanType.fromBooleanValue(respFiles.getBoolean(PROPERTY_BIGFILECHUNKING)));
-                    capability.setFilesUndelete(
-                            CapabilityBooleanType.fromBooleanValue(respFiles.getBoolean(PROPERTY_UNDELETE)));
-                    capability.setFilesVersioning(
-                            CapabilityBooleanType.fromBooleanValue(respFiles.getBoolean(PROPERTY_VERSIONING)));
-                    Log_OC.d(TAG, "*** Added " + NODE_FILES);
+                        // Add files_sharing: public, user, resharing
+                        if (respCapabilities.has(NODE_FILES_SHARING)) {
+                            JSONObject respFilesSharing = respCapabilities.getJSONObject(NODE_FILES_SHARING);
+                            if (respFilesSharing.has(PROPERTY_API_ENABLED)) {
+                                capability.setFilesSharingApiEnabled(CapabilityBooleanType.fromBooleanValue(
+                                        respFilesSharing.getBoolean(PROPERTY_API_ENABLED)));
+                            }
 
+                            if (respFilesSharing.has(NODE_PUBLIC)) {
+                                JSONObject respPublic = respFilesSharing.getJSONObject(NODE_PUBLIC);
+                                capability.setFilesSharingPublicEnabled(CapabilityBooleanType.fromBooleanValue(
+                                        respPublic.getBoolean(PROPERTY_ENABLED)));
+                                capability.setFilesPublicPasswordEnforced(CapabilityBooleanType.fromBooleanValue(
+                                        respPublic.getJSONObject(NODE_PASSWORD).getBoolean(PROPERTY_ENFORCED)));
+                                if(respPublic.has(NODE_EXPIRE_DATE)){
+                                    JSONObject respExpireDate = respPublic.getJSONObject(NODE_EXPIRE_DATE);
+                                    capability.setFilesSharingPublicExpireDateEnabled(
+                                            CapabilityBooleanType.fromBooleanValue(
+                                                    respExpireDate.getBoolean(PROPERTY_ENABLED)));
+                                    if (respExpireDate.has(PROPERTY_DAYS)) {
+                                        capability.setFilesSharingPublicExpireDateDays(
+                                                respExpireDate.getInt(PROPERTY_DAYS));
+                                    }
+                                    if (respExpireDate.has(PROPERTY_ENFORCED)) {
+                                        capability.setFilesSharingPublicExpireDateEnforced(
+                                                CapabilityBooleanType.fromBooleanValue(
+                                                        respExpireDate.getBoolean(PROPERTY_ENFORCED)));
+                                    }
+                                }
+                                if (respPublic.has(PROPERTY_UPLOAD)){
+                                    capability.setFilesSharingPublicUpload(CapabilityBooleanType.fromBooleanValue(
+                                            respPublic.getBoolean(PROPERTY_UPLOAD)));
+                                }
+                            }
+
+                            if (respFilesSharing.has(NODE_USER)) {
+                                JSONObject respUser = respFilesSharing.getJSONObject(NODE_USER);
+                                capability.setFilesSharingUserSendMail(CapabilityBooleanType.fromBooleanValue(
+                                        respUser.getBoolean(PROPERTY_SEND_MAIL)));
+                            }
+
+                            capability.setFilesSharingResharing(CapabilityBooleanType.fromBooleanValue(
+                                    respFilesSharing.getBoolean(PROPERTY_RESHARING)));
+                            if (respFilesSharing.has(NODE_FEDERATION)) {
+                                JSONObject respFederation = respFilesSharing.getJSONObject(NODE_FEDERATION);
+                                capability.setFilesSharingFederationOutgoing(
+                                CapabilityBooleanType.fromBooleanValue(respFederation.getBoolean(PROPERTY_OUTGOING)));
+                                capability.setFilesSharingFederationIncoming(CapabilityBooleanType.fromBooleanValue(
+                                        respFederation.getBoolean(PROPERTY_INCOMING)));
+                            }
+                            Log_OC.d(TAG, "*** Added " + NODE_FILES_SHARING);
+                        }
+
+
+                        if (respCapabilities.has(NODE_FILES)) {
+                            JSONObject respFiles = respCapabilities.getJSONObject(NODE_FILES);
+                            // Add files
+                            capability.setFilesBigFileChuncking(CapabilityBooleanType.fromBooleanValue(
+                                    respFiles.getBoolean(PROPERTY_BIGFILECHUNKING)));
+                            capability.setFilesUndelete(CapabilityBooleanType.fromBooleanValue(
+                                    respFiles.getBoolean(PROPERTY_UNDELETE)));
+                            capability.setFilesVersioning(CapabilityBooleanType.fromBooleanValue(
+                                    respFiles.getBoolean(PROPERTY_VERSIONING)));
+                            Log_OC.d(TAG, "*** Added " + NODE_FILES);
+                        }
+                    }
                     // Result
                     data.add(capability);
                     result = new RemoteOperationResult(true, status, get.getResponseHeaders());
