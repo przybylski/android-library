@@ -31,6 +31,7 @@ import com.owncloud.android.lib.common.OwnCloudClient;
 import com.owncloud.android.lib.common.operations.RemoteOperation;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
 import com.owncloud.android.lib.common.utils.Log_OC;
+import com.owncloud.android.lib.resources.shares.ShareType;
 
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.http.HttpStatus;
@@ -74,6 +75,7 @@ public class GetRemoteCapabilitiesOperation extends RemoteOperation {
     private static final String NODE_PASSWORD = "password";
     private static final String NODE_EXPIRE_DATE = "expire_date";
     private static final String NODE_USER = "user";
+    private static final String NODE_FEDERATION = "federation";
     private static final String NODE_FILES = "files";
 
     private static final String PROPERTY_STATUS = "status";
@@ -88,11 +90,15 @@ public class GetRemoteCapabilitiesOperation extends RemoteOperation {
     private static final String PROPERTY_STRING = "string";
     private static final String PROPERTY_EDITION = "edition";
 
+    private static final String PROPERTY_API_ENABLED = "api_enabled";
     private static final String PROPERTY_ENABLED = "enabled";
     private static final String PROPERTY_ENFORCED = "enforced";
+    private static final String PROPERTY_DAYS = "days";
     private static final String PROPERTY_SEND_MAIL = "send_mail";
     private static final String PROPERTY_UPLOAD = "upload";
     private static final String PROPERTY_RESHARING = "resharing";
+    private static final String PROPERTY_OUTGOING = "outgoing";
+    private static final String PROPERTY_INCOMING = "incoming";
 
     private static final String PROPERTY_BIGFILECHUNKING = "bigfilechunking";
     private static final String PROPERTY_UNDELETE = "undelete";
@@ -140,6 +146,7 @@ public class GetRemoteCapabilitiesOperation extends RemoteOperation {
                 JSONObject respFilesSharing = respCapabilities.getJSONObject(NODE_FILES_SHARING);
                 JSONObject respPublic = respFilesSharing.getJSONObject(NODE_PUBLIC);
                 JSONObject respUser = respFilesSharing.getJSONObject(NODE_USER);
+                JSONObject respFederation = respFilesSharing.getJSONObject(NODE_FEDERATION);
                 JSONObject respFiles = respCapabilities.getJSONObject(NODE_FILES);
 
                 // Read meta
@@ -163,21 +170,40 @@ public class GetRemoteCapabilitiesOperation extends RemoteOperation {
                     Log_OC.d(TAG, "*** Added " + NODE_CORE);
 
                     // Add files_sharing: public, user, resharing
-                    capability.setFilesSharingPublicEnabled(respPublic.getBoolean(PROPERTY_ENABLED));
+                    capability.setFilesSharingApiEnabled(
+                            CapabilityBooleanType.fromBooleanValue(respPublic.getBoolean(PROPERTY_API_ENABLED)));
+                    capability.setFilesSharingPublicEnabled(
+                            CapabilityBooleanType.fromBooleanValue(respPublic.getBoolean(PROPERTY_ENABLED)));
                     capability.setFilesPublicPasswordEnforced(
-                            respPublic.getJSONObject(NODE_PASSWORD).getBoolean(PROPERTY_ENFORCED));
+                            CapabilityBooleanType.fromBooleanValue(
+                                    respPublic.getJSONObject(NODE_PASSWORD).getBoolean(PROPERTY_ENFORCED)));
                     capability.setFilesSharingPublicExpireDateEnabled(
-                            respPublic.getJSONObject(NODE_EXPIRE_DATE).getBoolean(PROPERTY_ENABLED));
-                    capability.setFilesSharingPublicSendMail(respPublic.getBoolean(PROPERTY_SEND_MAIL));
-                    capability.setFilesSharingPublicUpload(respPublic.getBoolean(PROPERTY_UPLOAD));
-                    capability.setFilesSharingUserSendMail(respUser.getBoolean(PROPERTY_SEND_MAIL));
-                    capability.setFilesSharingResharing(respFilesSharing.getBoolean(PROPERTY_RESHARING));
+                            CapabilityBooleanType.fromBooleanValue(
+                                    respPublic.getJSONObject(NODE_EXPIRE_DATE).getBoolean(PROPERTY_ENABLED)));
+                    capability.setFilesSharingPublicExpireDateDays(
+                            respPublic.getJSONObject(NODE_EXPIRE_DATE).getInt(PROPERTY_DAYS));
+                    capability.setFilesSharingPublicExpireDateEnforced(
+                            CapabilityBooleanType.fromBooleanValue(
+                                    respPublic.getJSONObject(NODE_EXPIRE_DATE).getBoolean(PROPERTY_ENFORCED)));
+                    capability.setFilesSharingPublicUpload(
+                            CapabilityBooleanType.fromBooleanValue(respPublic.getBoolean(PROPERTY_UPLOAD)));
+                    capability.setFilesSharingUserSendMail(
+                            CapabilityBooleanType.fromBooleanValue(respUser.getBoolean(PROPERTY_SEND_MAIL)));
+                    capability.setFilesSharingResharing(
+                            CapabilityBooleanType.fromBooleanValue(respFilesSharing.getBoolean(PROPERTY_RESHARING)));
+                    capability.setFilesSharingFederationOutgoing(
+                            CapabilityBooleanType.fromBooleanValue(respFederation.getBoolean(PROPERTY_OUTGOING)));
+                    capability.setFilesSharingFederationOutgoing(
+                            CapabilityBooleanType.fromBooleanValue(respFederation.getBoolean(PROPERTY_INCOMING)));
                     Log_OC.d(TAG, "*** Added " + NODE_FILES_SHARING);
 
                     // Add files
-                    capability.setFilesBigFileChuncking(respFiles.getBoolean(PROPERTY_BIGFILECHUNKING));
-                    capability.setFilesUndelete(respFiles.getBoolean(PROPERTY_UNDELETE));
-                    capability.setFilesVersioning(respFiles.getBoolean(PROPERTY_VERSIONING));
+                    capability.setFilesBigFileChuncking(
+                            CapabilityBooleanType.fromBooleanValue(respFiles.getBoolean(PROPERTY_BIGFILECHUNKING)));
+                    capability.setFilesUndelete(
+                            CapabilityBooleanType.fromBooleanValue(respFiles.getBoolean(PROPERTY_UNDELETE)));
+                    capability.setFilesVersioning(
+                            CapabilityBooleanType.fromBooleanValue(respFiles.getBoolean(PROPERTY_VERSIONING)));
                     Log_OC.d(TAG, "*** Added " + NODE_FILES);
 
                     // Result
@@ -189,7 +215,7 @@ public class GetRemoteCapabilitiesOperation extends RemoteOperation {
                 } else {
                     result = new RemoteOperationResult(statusProp, statuscode, null);
                     Log_OC.e(TAG, "Failed response while getting capabilities from the server ");
-                    Log_OC.e(TAG, "*** status: " + statusProp+ "; message: " + message);
+                    Log_OC.e(TAG, "*** status: " + statusProp + "; message: " + message);
                 }
 
             } else {
