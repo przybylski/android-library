@@ -68,7 +68,16 @@ public enum CapabilityBooleanType {
         }
     }
 
+    public boolean isUnknow(){
+        return getValue() == -1;
+    }
+
+    public boolean isFalse(){
+        return getValue() == 0;
+    }
+
     public boolean isTrue(){
         return getValue() == 1;
     }
+
 };
