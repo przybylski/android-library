@@ -48,7 +48,7 @@ public class OCCapability {
     private CapabilityBooleanType mFilesSharingApiEnabled;
 
     private CapabilityBooleanType mFilesSharingPublicEnabled;
-    private CapabilityBooleanType mFilesPublicPasswordEnforced;
+    private CapabilityBooleanType mFilesSharingPublicPasswordEnforced;
     private CapabilityBooleanType mFilesSharingPublicExpireDateEnabled;
     private int mFilesSharingPublicExpireDateDays;
     private CapabilityBooleanType mFilesSharingPublicExpireDateEnforced;
@@ -81,7 +81,7 @@ public class OCCapability {
 
         mFilesSharingApiEnabled = CapabilityBooleanType.UNKNOWN;
         mFilesSharingPublicEnabled = CapabilityBooleanType.UNKNOWN;
-        mFilesPublicPasswordEnforced = CapabilityBooleanType.UNKNOWN;
+        mFilesSharingPublicPasswordEnforced = CapabilityBooleanType.UNKNOWN;
         mFilesSharingPublicExpireDateEnabled = CapabilityBooleanType.UNKNOWN;
         mFilesSharingPublicExpireDateDays = 0;
         mFilesSharingPublicExpireDateEnforced = CapabilityBooleanType.UNKNOWN;
@@ -180,12 +180,12 @@ public class OCCapability {
         this.mFilesSharingPublicEnabled = filesSharingPublicEnabled;
     }
 
-    public CapabilityBooleanType getFilesPublicPasswordEnforced() {
-        return mFilesPublicPasswordEnforced;
+    public CapabilityBooleanType getFilesSharingPublicPasswordEnforced() {
+        return mFilesSharingPublicPasswordEnforced;
     }
 
-    public void setFilesPublicPasswordEnforced(CapabilityBooleanType filesPublicPasswordEnforced) {
-        this.mFilesPublicPasswordEnforced = filesPublicPasswordEnforced;
+    public void setFilesSharingPublicPasswordEnforced(CapabilityBooleanType filesSharingPublicPasswordEnforced) {
+        this.mFilesSharingPublicPasswordEnforced = filesSharingPublicPasswordEnforced;
     }
 
     public CapabilityBooleanType getFilesSharingPublicExpireDateEnabled() {
