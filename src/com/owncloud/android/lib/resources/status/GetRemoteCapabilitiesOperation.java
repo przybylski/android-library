@@ -181,7 +181,7 @@ public class GetRemoteCapabilitiesOperation extends RemoteOperation {
                                 JSONObject respPublic = respFilesSharing.getJSONObject(NODE_PUBLIC);
                                 capability.setFilesSharingPublicEnabled(CapabilityBooleanType.fromBooleanValue(
                                         respPublic.getBoolean(PROPERTY_ENABLED)));
-                                capability.setFilesPublicPasswordEnforced(CapabilityBooleanType.fromBooleanValue(
+                                capability.setFilesSharingPublicPasswordEnforced(CapabilityBooleanType.fromBooleanValue(
                                         respPublic.getJSONObject(NODE_PASSWORD).getBoolean(PROPERTY_ENFORCED)));
                                 if(respPublic.has(NODE_EXPIRE_DATE)){
                                     JSONObject respExpireDate = respPublic.getJSONObject(NODE_EXPIRE_DATE);
